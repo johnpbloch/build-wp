@@ -11,4 +11,4 @@ RUN apk add --no-cache \
 
 RUN npm install -g grunt
 
-CMD ["sh"]
+CMD ["bash"]
