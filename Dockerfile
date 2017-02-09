@@ -11,4 +11,8 @@ RUN apk add --no-cache \
 
 RUN npm install -g grunt
 
-CMD ["bash"]
+COPY build-wp.sh /bin/build-wp
+
+RUN chmod +x /bin/build-wp
+
+ENTRYPOINT ["/bin/build-wp"]
