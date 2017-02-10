@@ -7,7 +7,8 @@ RUN apk add --no-cache \
     python \
     make \
     g++ \
-    nodejs
+    nodejs \
+    php-cli
 
 RUN npm install -g grunt
 
