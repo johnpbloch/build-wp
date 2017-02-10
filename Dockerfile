@@ -11,7 +11,7 @@ RUN apk add --no-cache \
     php-cli
 
 RUN npm set progress=false \
-    && npm install -g grunt
+    && npm install -g grunt yarn
 
 COPY build-wp.sh /bin/build-wp
 

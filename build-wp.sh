@@ -41,8 +41,7 @@ svn export --ignore-externals "https://develop.svn.wordpress.org/$ref/" /tmp/wp/
 pushd /tmp/wp/
 
 if [ -e "Gruntfile.js" ]; then
-    npm set progress=false && \
-        npm install && \
+    yarn install --ignore-optional --no-lockfile && \
         grunt
 
     if [ $? -ne 0 ]; then
@@ -58,7 +57,7 @@ git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/wordp
 
 pushd /tmp/wp-git
 
-if [[ `git branch -a | grep "remotes/origin/$branch"` ]]; then
+if [[ `git branch -a | grep -E "remotes/origin/$branch$"` ]]; then
     git checkout -b "$branch" "origin/$branch"
 else
     git checkout clean
