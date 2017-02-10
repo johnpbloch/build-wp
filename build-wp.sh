@@ -94,7 +94,7 @@ case $type in
         ;;
     master)
         tag=$(php -r 'include "wp-includes/version.php"; echo "$wp_version\n";')
-        if [[ `echo "$tag" | grep -vE "-\d{8}\.\d{6}$"` ]]; then
+        if [[ `echo "$tag" | grep -vE "\-\d{8}\.\d{6}$"` ]]; then
             if [[ ! `git tag | grep -F "$tag"` ]]; then
                 git tag "$tag"
             fi
