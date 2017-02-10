@@ -60,7 +60,9 @@ else
     git checkout -b $branch
 fi
 
-rm -r $(ls -1A | grep -vP '^\.git')
+if [ -e 'index.php' ]; then
+    rm -r $(ls -1A | grep -vE '^\.git')
+fi
 
 mv /tmp/wp/build/* .
 
@@ -73,7 +75,7 @@ git commit -m "Update from $ref\n\nSVN r$revision"
 case $type in
     tag)
         tag="$2"
-        if [[ `echo -n "$tag" | grep -P '^\s*\d+\.\d+\s*$'` ]]; then
+        if [[ `echo -n "$tag" | grep -E '^\s*\d+\.\d+\s*$'` ]]; then
             tag="$tag.0"
         fi
         git tag "$tag"
@@ -82,7 +84,7 @@ case $type in
         ;;
     master)
         tag=$(php -r 'include "wp-includes/version.php"; echo "$wp_version\n";')
-        if [[ ! `git tag | grep -P "^$tag$"` ]]; then
+        if [[ ! `git tag | grep -F "$tag"` ]]; then
             git tag "$tag"
         fi
         ;;
