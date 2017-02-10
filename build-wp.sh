@@ -35,13 +35,15 @@ if [ -d /tmp/wp ]; then
     rm -rf /tmp/wp
 fi
 
+echo "Grabbing WordPress sorce for $ref"
 revision=$(svn info "https://develop.svn.wordpress.org/$ref/" | grep 'Last Changed Rev' | sed 's/Last Changed Rev: //')
-svn export --ignore-externals "https://develop.svn.wordpress.org/$ref/" /tmp/wp/
+svn export --ignore-externals "https://develop.svn.wordpress.org/$ref/" /tmp/wp/ > /dev/null 2>&1
 
 pushd /tmp/wp/
 
 if [ -e "Gruntfile.js" ]; then
-    yarn install --ignore-optional --no-lockfile && \
+    echo "Installing npm dependencies..."
+    yarn install --ignore-optional --no-lockfile > /dev/null 2>&1 && \
         grunt
 
     if [ $? -ne 0 ]; then
@@ -53,33 +55,35 @@ else
     mv "$(ls -1A | grep -vE '^build$')" build
 fi
 
-git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/wordpress-core.git" /tmp/wp-git
+echo "Cloning git repository..."
+git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/wordpress-core.git" /tmp/wp-git > /dev/null 2>&1
 
 pushd /tmp/wp-git
 
 if [[ `git branch -a | grep -E "remotes/origin/$branch$"` ]]; then
-    git checkout -b "$branch" "origin/$branch"
+    git checkout -b "$branch" "origin/$branch" > /dev/null 2>&1
 else
-    git checkout clean
-    git checkout -b $branch
+    git checkout clean > /dev/null 2>&1
+    git checkout -b $branch > /dev/null 2>&1
 fi
 
 if [ -e 'index.php' ]; then
     rm -r $(ls -1A | grep -vE '^\.git')
 fi
 
-git config --global user.email "johnpbloch+ghbot@gmail.com"
-git config --global user.name "John P Bot"
+git config --global user.email "johnpbloch+ghbot@gmail.com" > /dev/null 2>&1
+git config --global user.name "John P Bot" > /dev/null 2>&1
 
 mv /tmp/wp/build/* .
 
 cp /var/composer.json .
 
-git add -A .
+echo "Committing changes"
+git add -A . > /dev/null 2>&1
 
 git commit -m "Update from $ref
 
-SVN r$revision"
+SVN r$revision" > /dev/null 2>&1
 
 case $type in
     tag)
@@ -88,8 +92,8 @@ case $type in
             tag="$tag.0"
         fi
         git tag "$tag"
-        git rm composer.json
-        git commit -m "Hide tag branch from packagist"
+        git rm composer.json > /dev/null 2>&1
+        git commit -m "Hide tag branch from packagist" > /dev/null 2>&1
         ;;
     master)
         tag=$(php -r 'include "wp-includes/version.php"; echo "$wp_version\n";')
