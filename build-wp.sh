@@ -40,13 +40,18 @@ svn export --ignore-externals "https://develop.svn.wordpress.org/$ref/" /tmp/wp/
 
 pushd /tmp/wp/
 
-npm set progress=false && \
-    npm install && \
-    grunt
+if [ -e "Gruntfile.js" ]; then
+    npm set progress=false && \
+        npm install && \
+        grunt
 
-if [ $? -ne 0 ]; then
-    echo "Error installing npm or running grunt!"
-    exit 3
+    if [ $? -ne 0 ]; then
+        echo "Error installing npm or running grunt!"
+        exit 3
+    fi
+else
+    mkdir build
+    mv "$(ls -1A | grep -vE '^build$')" build
 fi
 
 git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/wordpress-core.git" /tmp/wp-git
