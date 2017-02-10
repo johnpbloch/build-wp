@@ -73,7 +73,11 @@ cp /var/composer.json .
 
 git add -A .
 
-git commit -m "Update from $ref\n\nSVN r$revision"
+git commit -m << EOM
+Update from $ref
+
+SVN r$revision
+EOM
 
 case $type in
     tag)
