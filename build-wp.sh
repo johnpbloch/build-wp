@@ -64,6 +64,9 @@ if [ -e 'index.php' ]; then
     rm -r $(ls -1A | grep -vE '^\.git')
 fi
 
+git config --global user.email "johnpbloch+ghbot@gmail.com"
+git config --global user.name "John P Bot"
+
 mv /tmp/wp/build/* .
 
 cp /var/composer.json .
