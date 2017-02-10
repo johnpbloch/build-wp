@@ -19,4 +19,7 @@ RUN chmod +x /bin/build-wp
 
 COPY files/composer.json /var/composer.json
 
+ENV GITHUB_AUTH_USER=""
+ENV GITHUB_AUTH_PW=""
+
 ENTRYPOINT ["/bin/build-wp"]

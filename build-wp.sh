@@ -1,5 +1,13 @@
 #!/bin/bash
 
+if [ -z "$GITHUB_AUTH_USER" ]; then
+    echo 'You must define the GITHUB_AUTH_USER environment variable!'
+    exit 2
+elif [ -z "$GITHUB_AUTH_PW" ]; then
+    echo 'You must define the GITHUB_AUTH_PW environment variable!'
+    exit 2
+fi
+
 if [ $# -lt 2 ]; then
     type="master"
     branch="master"
