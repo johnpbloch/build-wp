@@ -32,7 +32,8 @@ svn export --ignore-externals "https://develop.svn.wordpress.org/$ref/" /tmp/wp/
 
 pushd /tmp/wp/
 
-npm install && \
+npm set progress=false && \
+    npm install && \
     grunt
 
 if [ $? -ne 0 ]; then
