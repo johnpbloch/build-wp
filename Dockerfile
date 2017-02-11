@@ -14,10 +14,10 @@ RUN npm set progress=false \
     && npm install -g grunt yarn phantomjs
 
 RUN svn export --ignore-externals https://develop.svn.wordpress.org/trunk/ /var/wptrunk \
-    && pushd /var/wptrunk \
+    && cd /var/wptrunk \
     && yarn install  --ignore-optional --no-lockfile \
     && mv node_modules .. \
-    && popd \
+    && cd - \
     && rm -rf /var/wptrunk
 
 COPY build-wp.sh /bin/build-wp
