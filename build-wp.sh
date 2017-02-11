@@ -52,7 +52,7 @@ if [ -e "Gruntfile.js" ]; then
     fi
 else
     mkdir build
-    mv "$(ls -1A | grep -vE '^build$')" build
+    mv $(ls -A | grep -vE '^build$') build
 fi
 
 echo "Cloning git repository..."
