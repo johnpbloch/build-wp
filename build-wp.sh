@@ -35,7 +35,7 @@ if [ -d /tmp/wp ]; then
     rm -rf /tmp/wp
 fi
 
-echo "Grabbing WordPress sorce for $ref"
+echo "Grabbing WordPress source for $ref"
 revision=$(svn info "https://develop.svn.wordpress.org/$ref/" | grep 'Last Changed Rev' | sed 's/Last Changed Rev: //')
 svn export --ignore-externals "https://develop.svn.wordpress.org/$ref/" /tmp/wp/ > /dev/null 2>&1
 
