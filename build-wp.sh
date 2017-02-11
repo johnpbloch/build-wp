@@ -43,7 +43,6 @@ pushd /tmp/wp/
 
 if [ -e "Gruntfile.js" ]; then
     echo "Installing npm dependencies..."
-    yarn install --ignore-optional --no-lockfile > /dev/null 2>&1
     yarn install --ignore-optional --no-lockfile > /dev/null 2>&1 && \
         grunt
 
