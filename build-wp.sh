@@ -105,4 +105,8 @@ case $type in
         ;;
 esac
 
-git push --tags origin "$branch"
+if [ ${tag+x} ]; then
+    echo "Pushing tag $tag"
+fi
+echo "Pushing $branch to origin"
+git push --tags origin "$branch" > /dev/null 2>&1
