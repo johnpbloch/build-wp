@@ -13,6 +13,21 @@ mkdir -p cached/tags
 
 docker pull johnpbloch/build-wp:latest
 
+latest_rev=$(svn info "$SVN_REPO/trunk/" | grep 'Last Changed Rev' | sed 's/Last Changed Rev: //')
+update_trunk="y"
+if [ -e "cached/trunk" ]; then
+    local_rev=$(cat "cached/trunk")
+    if [ "$local_rev" == "$latest_rev" ]; then
+        echo "No changes to trunk, skipping"
+        update_trunk="n"
+    fi
+fi
+if [ "$update_trunk" == "y" ]; then
+    echo "Processing trunk"
+    docker run -e GITHUB_AUTH_USER="johnpbloch-bot" -e GITHUB_AUTH_PW="$GH_PW" --rm johnpbloch/build-wp:latest && \
+    echo -n $latest_rev > "cached/trunk"
+fi
+
 for branch in $LIVE_BRANCHES; do
     latest_rev=$(svn info "$SVN_REPO/branches/$branch/" | grep 'Last Changed Rev' | sed 's/Last Changed Rev: //')
     if [ -e "cached/branches/$branch" ]; then
@@ -36,18 +51,3 @@ for tag in $LIVE_TAGS; do
     docker run -e GITHUB_AUTH_USER="johnpbloch-bot" -e GITHUB_AUTH_PW="$GH_PW" --rm johnpbloch/build-wp:latest tag $tag && \
     echo -n $latest_rev > "cached/tags/$tag"
 done
-
-latest_rev=$(svn info "$SVN_REPO/trunk/" | grep 'Last Changed Rev' | sed 's/Last Changed Rev: //')
-update_trunk="y"
-if [ -e "cached/trunk" ]; then
-    local_rev=$(cat "cached/trunk")
-    if [ "$local_rev" == "$latest_rev" ]; then
-        echo "No changes to trunk, skipping"
-        update_trunk="n"
-    fi
-fi
-if [ "$update_trunk" == "y" ]; then
-    echo "Processing trunk"
-    docker run -e GITHUB_AUTH_USER="johnpbloch-bot" -e GITHUB_AUTH_PW="$GH_PW" --rm johnpbloch/build-wp:latest && \
-    echo -n $latest_rev > "cached/trunk"
-fi
