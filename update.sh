@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ -z ${GH_PW+x} ]; then
     echo -n "Github access token: "
