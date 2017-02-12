@@ -44,6 +44,7 @@ pushd /tmp/wp/
 if [ -e "Gruntfile.js" ]; then
     echo "Installing npm dependencies..."
     mv /var/node_modules /tmp/wp/node_modules
+    sed -i -e 's/97c43554ff7a86e2ff414d34e66725b05118bf10/936144c11fdee00427c3ce3cb0f87ee5770149b7/' package.json
     npm install > /dev/null 2>&1 && \
         grunt
 
