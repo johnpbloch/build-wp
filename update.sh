@@ -5,8 +5,8 @@ if [ -z ${GH_PW+x} ]; then
     read -s GH_PW
 fi
 SVN_REPO="https://develop.svn.wordpress.org"
-LIVE_BRANCHES=$(curl "$SVN_REPO/branches/" 2>/dev/null | sed -r 's/.+>([0-9]+(\.[0-9]+)+)\/<.+/\1/;tx;d;:x' | sort -rV)
-LIVE_TAGS=$(curl "$SVN_REPO/tags/" 2>/dev/null | sed -r 's/.+>([0-9]+(\.[0-9]+)+)\/<.+/\1/;tx;d;:x' | sort -rV)
+LIVE_BRANCHES=$(curl "$SVN_REPO/branches/" 2>/dev/null | sed -r 's/.+>([0-9]+(\.[0-9]+)+)\/<.+/\1/;tx;d;:x' | grep -Pv '^(1|2|3\.[0-6])' | sort -rV)
+LIVE_TAGS=$(curl "$SVN_REPO/tags/" 2>/dev/null | sed -r 's/.+>([0-9]+(\.[0-9]+)+)\/<.+/\1/;tx;d;:x' | grep -Pv '^(1|2|3\.[0-6])' | sort -rV)
 
 mkdir -p cached/branches
 mkdir -p cached/tags
