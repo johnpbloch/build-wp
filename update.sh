@@ -28,13 +28,9 @@ for branch in $LIVE_BRANCHES; do
 done
 
 for tag in $LIVE_TAGS; do
-    latest_rev=$(svn info "$SVN_REPO/tags/$tag/" | grep 'Last Changed Rev' | sed 's/Last Changed Rev: //')
     if [ -e "cached/tags/$tag" ]; then
-        local_rev=$(cat "cached/tags/$tag")
-        if [ "$local_rev" == "$latest_rev" ]; then
-            echo "No changes to tag $tag, skipping"
-            continue
-        fi
+        echo "No changes to tag $tag, skipping"
+        continue
     fi
     echo "Processing tag $tag"
     docker run -e GITHUB_AUTH_USER="johnpbloch-bot" -e GITHUB_AUTH_PW="$GH_PW" --rm johnpbloch/build-wp:latest tag $tag && \
