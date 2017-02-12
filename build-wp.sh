@@ -24,6 +24,11 @@ else
             branch="tag-$2"
             ref="tags/$2"
             ;;
+        master)
+            type="master"
+            branch="master"
+            ref="trunk"
+            ;;
         *)
             echo "Invalid type"
             exit 1
