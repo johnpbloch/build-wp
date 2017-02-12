@@ -85,6 +85,26 @@ mv /tmp/wp/build/* .
 
 cp /var/composer.json .
 
+unset tag
+case $type in
+    tag)
+        tag="$2"
+        if [[ `echo -n "$tag" | grep -E '^\s*\d+\.\d+\s*$'` ]]; then
+            tag="$tag.0"
+        fi
+        ;;
+    master)
+        tag=$(php -r 'include "wp-includes/version.php"; echo "$wp_version\n";')
+        if [[ `echo "$tag" | grep -E "\-\d{8}\.\d{6}$"` ]]; then
+            newversion="${tag:0: -15}$revision"
+            sed -i -e "s/$tag/$newversion/" wp-includes/version.php
+            unset tag
+        elif [[ `git tag | grep -F "$tag"` ]]; then
+            unset tag
+        fi
+        ;;
+esac
+
 echo "Committing changes"
 git add -A . > /dev/null 2>&1
 
@@ -92,25 +112,14 @@ git commit -m "Update from $ref
 
 SVN r$revision" > /dev/null 2>&1
 
-case $type in
-    tag)
-        tag="$2"
-        if [[ `echo -n "$tag" | grep -E '^\s*\d+\.\d+\s*$'` ]]; then
-            tag="$tag.0"
-        fi
-        git tag "$tag"
-        git rm composer.json > /dev/null 2>&1
-        git commit -m "Hide tag branch from packagist" > /dev/null 2>&1
-        ;;
-    master)
-        tag=$(php -r 'include "wp-includes/version.php"; echo "$wp_version\n";')
-        if [[ `echo "$tag" | grep -vE "\-\d{8}\.\d{6}$"` ]]; then
-            if [[ ! `git tag | grep -F "$tag"` ]]; then
-                git tag "$tag"
-            fi
-        fi
-        ;;
-esac
+if [ -n ${tag+x} ]; then
+    git tag "$tag"
+fi
+
+if [ "tag" == "$type" ]; then
+    git rm composer.json > /dev/null 2>&1
+    git commit -m "Hide tag branch from packagist" > /dev/null 2>&1
+fi
 
 if [ ${tag+x} ]; then
     echo "Pushing tag $tag"
