@@ -17,7 +17,7 @@ latest_rev=$(svn info "$SVN_REPO/trunk/" | grep 'Last Changed Rev' | sed 's/Last
 update_trunk="y"
 if [ -e "cached/trunk" ]; then
     local_rev=$(cat "cached/trunk")
-    echo "Trunk cache exists, latest: $latest_rev cached: $cached"
+    echo "Trunk cache exists, latest: $latest_rev cached: $local_rev"
     if [ "$local_rev" == "$latest_rev" ]; then
         echo "No changes to trunk, skipping"
         update_trunk="n"
