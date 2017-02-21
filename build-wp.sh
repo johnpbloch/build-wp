@@ -47,10 +47,10 @@ svn export --ignore-externals "https://develop.svn.wordpress.org/$ref/" /tmp/wp/
 pushd /tmp/wp/
 
 exit_on_error(){
-    echo $1
-    if [ -n $3 ]; then
+    echo "$1"
+    if [ $# -gt 2 ]; then
         echo 'Output from command:'
-        echo $3
+        echo "$3"
     fi
     exit $2
 }
