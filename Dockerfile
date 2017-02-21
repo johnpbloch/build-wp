@@ -1,4 +1,4 @@
-FROM alpine:3.3
+FROM alpine:3.5
 
 RUN apk add --no-cache \
     git \
@@ -8,7 +8,7 @@ RUN apk add --no-cache \
     make \
     g++ \
     nodejs \
-    php-cli
+    php5-cli
 
 RUN npm set progress=false \
     && npm install -g grunt yarn phantomjs
