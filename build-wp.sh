@@ -59,10 +59,9 @@ if [ -e "Gruntfile.js" ]; then
     echo "Installing npm dependencies..."
     mv /var/node_modules /tmp/wp/node_modules
     sed -i -e 's/97c43554ff7a86e2ff414d34e66725b05118bf10/936144c11fdee00427c3ce3cb0f87ee5770149b7/' package.json
-    echo 'Running npm install...'
-    output="$(npm install 2>&1)" || exit_on_error 'NPM install failed' 3 $output
+    output="$(npm install 2>&1)" || exit_on_error 'NPM install failed' 3 "$output"
     echo 'Running grunt...'
-    output="$(grunt)" || exit_on_error 'Grunt failed' 3 $output
+    output="$(grunt)" || exit_on_error 'Grunt failed' 3 "$output"
 else
     mkdir build
     mv $(ls -A | grep -vE '^build$') build
@@ -131,4 +130,4 @@ if [ $tag ]; then
     echo "Pushing tag $tag"
 fi
 echo "Pushing $branch to origin"
-output="$(git push --tags origin $branch 2>&1)" || exit_on_error 'Git push failed' 4 $output
+output="$(git push --tags origin $branch 2>&1)" || exit_on_error 'Git push failed' 4 "$output"
