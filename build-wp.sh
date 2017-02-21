@@ -46,17 +46,23 @@ svn export --ignore-externals "https://develop.svn.wordpress.org/$ref/" /tmp/wp/
 
 pushd /tmp/wp/
 
+exit_on_error(){
+    echo $1
+    if [ -n $3 ]; then
+        echo 'Output from command:'
+        echo $3
+    fi
+    exit $2
+}
+
 if [ -e "Gruntfile.js" ]; then
     echo "Installing npm dependencies..."
     mv /var/node_modules /tmp/wp/node_modules
     sed -i -e 's/97c43554ff7a86e2ff414d34e66725b05118bf10/936144c11fdee00427c3ce3cb0f87ee5770149b7/' package.json
-    npm install > /dev/null 2>&1 && \
-        grunt
-
-    if [ $? -ne 0 ]; then
-        echo "Error installing npm or running grunt!"
-        exit 3
-    fi
+    echo 'Running npm install...'
+    output="$(npm install 2>&1)" || exit_on_error 'NPM install failed' 3 $output
+    echo 'Running grunt...'
+    output="$(grunt)" || exit_on_error 'Grunt failed' 3 $output
 else
     mkdir build
     mv $(ls -A | grep -vE '^build$') build
@@ -105,14 +111,14 @@ case $type in
         ;;
 esac
 
-echo "Committing changes"
+echo "Committing changes..."
 git add -A . > /dev/null 2>&1
 
 git commit -m "Update from $ref
 
 SVN r$revision" > /dev/null 2>&1
 
-if [ -n ${tag+x} ]; then
+if [ -n $tag ]; then
     git tag "$tag"
 fi
 
@@ -121,8 +127,8 @@ if [ "tag" == "$type" ]; then
     git commit -m "Hide tag branch from packagist" > /dev/null 2>&1
 fi
 
-if [ ${tag+x} ]; then
+if [ $tag ]; then
     echo "Pushing tag $tag"
 fi
 echo "Pushing $branch to origin"
-git push --tags origin "$branch" > /dev/null 2>&1
+output="$(git push --tags origin $branch 2>&1)" || exit_on_error 'Git push failed' 4 $output
