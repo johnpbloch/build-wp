@@ -8,7 +8,8 @@ RUN apk add --no-cache \
     make \
     g++ \
     nodejs \
-    php5-cli
+    php5-cli \
+    jq
 
 RUN npm set progress=false \
     && npm install -g grunt yarn phantomjs

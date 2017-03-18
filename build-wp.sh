@@ -59,8 +59,8 @@ if [ -e "Gruntfile.js" ]; then
     echo "Installing npm dependencies..."
     sed -i -e 's/97c43554ff7a86e2ff414d34e66725b05118bf10/936144c11fdee00427c3ce3cb0f87ee5770149b7/' package.json
     sed -i -e 's/~/^/g' package.json
-    sed -i -e 's/"grunt-sass": "^0.\d*.\d*",/"grunt-sass": "^1.0.0",/' package.json
-    sed -i -e 's/"grunt-contrib-imagemin": "^0.\d*.\d*",/"grunt-contrib-imagemin": "^1.0.0",/' package.json
+    cat package.json | jq '.devDependencies."grunt-sass" = if .devDependencies."grunt-sass" | test("\\^0\\.\\d+\\.\\d+") then "^1.0.0" else .devDependencies."grunt-sass" end' > package.nn.json && mv package.nn.json package.json
+    cat package.json | jq '.devDependencies."grunt-contrib-imagemin" = if .devDependencies."grunt-contrib-imagemin" | test("\\^0\\.\\d+\\.\\d+") then "^1.0.0" else .devDependencies."grunt-contrib-imagemin" end' > package.nn.json && mv package.nn.json package.json
     output="$(npm update --dev 2>&1)" || exit_on_error 'NPM install failed' 3 "$output"
     echo 'Running grunt...'
     output="$(grunt)" || exit_on_error 'Grunt failed' 3 "$output"
