@@ -133,3 +133,33 @@ if [ $tag ]; then
 fi
 echo "Pushing $branch to origin"
 output="$(git push --tags origin $branch 2>&1)" || exit_on_error 'Git push failed' 4 "$output"
+
+case $type in
+    tag)
+        echo "Tagging $tag in the meta repo"
+        git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/wordpress.git" /tmp/wp-git-meta > /dev/null 2>&1
+        cd /tmp/wp-git-meta
+        tag_branch="${tag%.*}"
+        git checkout -b $tag_branch
+        cat composer.json | jq '.require."johnpbloch/wordpress-core" = "'$tag'"' > temp && mv temp composer.json
+        git add composer.json
+        git commit -m "Add $tag tag"
+        cat composer.json | jq '.require."johnpbloch/wordpres-core" = "'$tag_branch'.x-dev"' > temp && mv temp composer.json
+        git add composer.json
+        git commit -m "Reset $tag_branch branch"
+        git push --tags origin $tag_branch
+        ;;
+    branch)
+        exists=$(curl -sS https://api.github.com/repos/johnpbloch/wordpress/branches | jq -r 'map(select(.name == "'$branch'")) | .[0]?.name')
+        if [ "$exists" != "$branch" ]; then
+            echo "Adding $branch branch to the meta repo"
+            cd /tmp
+            git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/wordpress.git" /tmp/wp-git-meta > /dev/null 2>&1
+            cd wp-git-meta
+            git checkout -b $branch
+            cat composer.json | jq '.require."johnpbloch/wordpres-core" = "'$branch'.x-dev"' > temp && mv temp composer.json
+            git add composer.json
+            git commit -m "Add $branch branch"
+            git push origin $branch
+        fi
+        ;;
