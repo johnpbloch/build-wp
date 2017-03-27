@@ -163,3 +163,4 @@ case $type in
             git push origin $branch
         fi
         ;;
+esac
