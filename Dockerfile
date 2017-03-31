@@ -9,6 +9,7 @@ RUN apk add --no-cache \
     g++ \
     nodejs \
     php5-cli \
+    curl \
     jq
 
 RUN npm set progress=false \
