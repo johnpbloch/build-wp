@@ -149,6 +149,7 @@ case $type in
         cat composer.json | jq '.require."johnpbloch/wordpress-core" = "'$tag'"' > temp && mv temp composer.json
         git add composer.json
         git commit -m "Add $tag tag"
+		git tag "$tag"
         cat composer.json | jq '.require."johnpbloch/wordpres-core" = "'$tag_branch'.x-dev"' > temp && mv temp composer.json
         git add composer.json
         git commit -m "Reset $tag_branch branch"
