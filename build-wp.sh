@@ -50,9 +50,9 @@ exit_on_error(){
 }
 
 echo "Grabbing WordPress source for $ref"
+revision=$(svn info "https://develop.svn.wordpress.org/$ref/" | grep 'Last Changed Rev' | sed 's/Last Changed Rev: //')
 if [ "tag" == $type ]; then
 else
-revision=$(svn info "https://develop.svn.wordpress.org/$ref/" | grep 'Last Changed Rev' | sed 's/Last Changed Rev: //')
 svn export --ignore-externals "https://develop.svn.wordpress.org/$ref/" /tmp/wp/ > /dev/null 2>&1
 
 pushd /tmp/wp/
