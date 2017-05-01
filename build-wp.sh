@@ -40,12 +40,6 @@ if [ -d /tmp/wp ]; then
     rm -rf /tmp/wp
 fi
 
-echo "Grabbing WordPress source for $ref"
-revision=$(svn info "https://develop.svn.wordpress.org/$ref/" | grep 'Last Changed Rev' | sed 's/Last Changed Rev: //')
-svn export --ignore-externals "https://develop.svn.wordpress.org/$ref/" /tmp/wp/ > /dev/null 2>&1
-
-pushd /tmp/wp/
-
 exit_on_error(){
     echo "$1"
     if [ $# -gt 2 ]; then
@@ -54,6 +48,12 @@ exit_on_error(){
     fi
     exit $2
 }
+
+echo "Grabbing WordPress source for $ref"
+revision=$(svn info "https://develop.svn.wordpress.org/$ref/" | grep 'Last Changed Rev' | sed 's/Last Changed Rev: //')
+svn export --ignore-externals "https://develop.svn.wordpress.org/$ref/" /tmp/wp/ > /dev/null 2>&1
+
+pushd /tmp/wp/
 
 if [ -e "Gruntfile.js" ]; then
     echo "Installing npm dependencies..."
