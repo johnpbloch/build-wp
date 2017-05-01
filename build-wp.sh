@@ -52,7 +52,12 @@ exit_on_error(){
 echo "Grabbing WordPress source for $ref"
 revision=$(svn info "https://develop.svn.wordpress.org/$ref/" | grep 'Last Changed Rev' | sed 's/Last Changed Rev: //')
 if [ "tag" == $type ]; then
-    curl -sSL "https://wordpress.org/wordpress-$2.tar.gz" > /tmp/wordpress.tar.gz
+    tag_archive="https://wordpress.org/wordpress-$2.tar.gz"
+    tag_status=$(curl -Is -o /dev/null -w "%{http_code}\n" $tag_archive);
+    if [ "200" != $tag_status ]; then
+        exit_on_error "Tag $2 does not have an archive yet!" 5
+    fi
+    curl -sSL $tag_archive > /tmp/wordpress.tar.gz
     pushd /tmp
     tar -xzf wordpress.tar.gz
     mkdir -p wp/build
