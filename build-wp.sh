@@ -163,7 +163,7 @@ case $type in
         git add composer.json
         git commit -m "Add $tag tag"
 		git tag "$tag"
-        cat composer.json | jq '.require."johnpbloch/wordpres-core" = "'$tag_branch'.x-dev"' > temp && mv temp composer.json
+        cat composer.json | jq '.require."johnpbloch/wordpress-core" = "'$tag_branch'.x-dev"' > temp && mv temp composer.json
         git add composer.json
         git commit -m "Reset $tag_branch branch"
         git push --tags origin $tag_branch
@@ -176,7 +176,7 @@ case $type in
             git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/wordpress.git" /tmp/wp-git-meta > /dev/null 2>&1
             cd wp-git-meta
             git checkout -b $branch
-            cat composer.json | jq '.require."johnpbloch/wordpres-core" = "'$branch'.x-dev"' > temp && mv temp composer.json
+            cat composer.json | jq '.require."johnpbloch/wordpress-core" = "'$branch'.x-dev"' > temp && mv temp composer.json
             git add composer.json
             git commit -m "Add $branch branch"
             git push origin $branch
