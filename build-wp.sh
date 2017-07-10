@@ -104,6 +104,7 @@ git config --global user.name "John P Bot" > /dev/null 2>&1
 mv /tmp/wp/build/* .
 
 cp /var/composer.json .
+chmod 644 ./composer.json
 
 unset tag
 case $type in
