@@ -107,12 +107,14 @@ cp /var/composer.json .
 chmod 644 ./composer.json
 
 unset tag
+unset provide
 case $type in
     tag)
         tag="$2"
         if [[ `echo -n "$tag" | grep -E '^\s*\d+\.\d+\s*$'` ]]; then
             tag="$tag.0"
         fi
+        provide="$tag"
         ;;
     master)
         tag=$(php -r 'include "wp-includes/version.php"; echo "$wp_version\n";')
@@ -123,8 +125,16 @@ case $type in
         elif [[ `git tag | grep -F "$tag"` ]]; then
             unset tag
         fi
+        provide="dev-master"
+        ;;
+    branch)
+        provide="$branch.x-dev"
         ;;
 esac
+
+if [ -n $provide ]; then
+    cat composer.json | jq '.provide."wordpress/core-implementation" = "'$provide'"' > temp && mv temp composer.json
+fi
 
 echo "Committing changes..."
 git add -A . > /dev/null 2>&1
