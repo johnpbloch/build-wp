@@ -5,15 +5,9 @@ RUN apk add --no-cache \
     subversion \
     bash \
     python \
-    make \
-    g++ \
-    nodejs \
     php5-cli \
     curl \
     jq
-
-RUN npm set progress=false \
-    && npm install -g grunt yarn phantomjs
 
 COPY build-wp.sh /bin/build-wp
 
