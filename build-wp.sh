@@ -74,7 +74,8 @@ else
     fi
     curl -sSL $archive > /tmp/wordpress.tar.gz
     pushd /tmp
-    tar -xzf wordpress.tar.gz --one-top-level --strip-components=1
+    mkdir -p wordpress
+    tar -xzf wordpress.tar.gz --strip-components=1 -C wordpress/
     mkdir -p wp/build
     mv wordpress/* wp/build/
 fi
