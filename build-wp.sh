@@ -182,8 +182,8 @@ case $type in
         git push --tags origin $tag_branch
         ;;
     branch)
-        exists=$(curl -sS https://api.github.com/repos/johnpbloch/wordpress/branches | jq -r 'map(select(.name == "'$branch'")) | .[0]?.name')
-        if [ "$exists" != "$branch" ]; then
+        branch_status=$(curl -ILs -o /dev/null -w "%{http_code}\n" https://api.github.com/repos/johnpbloch/wordpress/branches/$branch)
+        if [ "404" == $branch_status ]; then
             echo "Adding $branch branch to the meta repo"
             cd /tmp
             git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/wordpress.git" /tmp/wp-git-meta > /dev/null 2>&1
