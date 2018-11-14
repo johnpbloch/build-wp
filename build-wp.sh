@@ -68,7 +68,7 @@ else
     else
         archive="https://github.com/WordPress/WordPress/archive/master.tar.gz"
     fi
-    archive_status=$(curl -Is -o /dev/null -w "%{http_code}\n" $archive)
+    archive_status=$(curl -ILs -o /dev/null -w "%{http_code}\n" $archive)
     if [ "200" != $archive_status ]; then
         exit_on_error "Archive $2 does not exist yet!" 5
     fi
