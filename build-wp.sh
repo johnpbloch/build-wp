@@ -133,6 +133,10 @@ if [ -n $provide ]; then
     cat composer.json | jq '.provide."wordpress/core-implementation" = "'$provide'"' > temp && mv temp composer.json
 fi
 
+if git diff --exit-code > /dev/null 2>&1 ; then
+    exit_on_error "No changes to be committed." 9
+fi
+
 echo "Committing changes..."
 git add -A . > /dev/null 2>&1
 
