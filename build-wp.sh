@@ -63,23 +63,20 @@ if [ "tag" == $type ]; then
     mkdir -p wp/build
     mv wordpress/* wp/build/
 else
-    svn export --ignore-externals "https://develop.svn.wordpress.org/$ref/" /tmp/wp/ > /dev/null 2>&1
-
-    pushd /tmp/wp/
-
-    if [ -e "Gruntfile.js" ]; then
-        echo "Installing npm dependencies..."
-        sed -i -e 's/97c43554ff7a86e2ff414d34e66725b05118bf10/936144c11fdee00427c3ce3cb0f87ee5770149b7/' package.json
-        sed -i -e 's/~/^/g' package.json
-        cat package.json | jq '.devDependencies."grunt-sass" = if .devDependencies."grunt-sass" | test("\\^0\\.\\d+\\.\\d+") then "^1.0.0" else .devDependencies."grunt-sass" end' > package.nn.json && mv package.nn.json package.json
-        cat package.json | jq '.devDependencies."grunt-contrib-imagemin" = if .devDependencies."grunt-contrib-imagemin" | test("\\^0\\.\\d+\\.\\d+") then "^1.0.0" else .devDependencies."grunt-contrib-imagemin" end' > package.nn.json && mv package.nn.json package.json
-        output="$(npm update --dev 2>&1)" || exit_on_error 'NPM install failed' 3 "$output"
-        echo 'Running grunt...'
-        output="$(grunt)" || exit_on_error 'Grunt failed' 3 "$output"
+    if [ "branch" == $type ]; then
+        archive="https://github.com/WordPress/WordPress/archive/${branch}-branch.tar.gz"
     else
-        mkdir build
-        mv $(ls -A | grep -vE '^build$') build
+        archive="https://github.com/WordPress/WordPress/archive/master.tar.gz"
     fi
+    archive_status=$(curl -Is -o /dev/null -w "%{http_code}\n" $archive)
+    if [ "200" != $archive_status ]; then
+        exit_on_error "Archive $2 does not exist yet!" 5
+    fi
+    curl -sSL $archive > /tmp/wordpress.tar.gz
+    pushd /tmp
+    tar -xzf wordpress.tar.gz --one-top-level --strip-components=1
+    mkdir -p wp/build
+    mv wordpress/* wp/build/
 fi
 
 echo "Cloning git repository..."
@@ -173,7 +170,7 @@ case $type in
         cat composer.json | jq '.require."johnpbloch/wordpress-core" = "'$tag'"' > temp && mv temp composer.json
         git add composer.json
         git commit -m "Add $tag tag"
-		git tag "$tag"
+        git tag "$tag"
         cat composer.json | jq '.require."johnpbloch/wordpress-core" = "'$tag_branch'.x-dev"' > temp && mv temp composer.json
         git add composer.json
         git commit -m "Reset $tag_branch branch"
