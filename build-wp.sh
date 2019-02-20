@@ -115,14 +115,6 @@ case $type in
         provide="$tag"
         ;;
     master)
-        tag=$(php -r 'include "wp-includes/version.php"; echo "$wp_version\n";')
-        if [[ `echo "$tag" | grep -E "\-\d{8}\.\d{6}$"` ]]; then
-            newversion="${tag:0: -15}$revision"
-            sed -i -e "s/$tag/$newversion/" wp-includes/version.php
-            unset tag
-        elif [[ `git tag | grep -F "$tag"` ]]; then
-            unset tag
-        fi
         provide="dev-master"
         ;;
     branch)
