@@ -21,7 +21,7 @@ else
             ;;
         tag)
             type="tag"
-            branch="tag-$2"
+            branch="$(echo $2 | sed 's/^\(\d\d*\.\d\d*\).*$/\1/')"
             ref="tags/$2"
             ;;
         master)
