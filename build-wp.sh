@@ -88,7 +88,9 @@ pushd /tmp/wp-git
 if [[ `git branch -a | grep -E "remotes/origin/$branch$"` ]]; then
     git checkout -b "$branch" "origin/$branch" > /dev/null 2>&1
 else
-    git checkout clean > /dev/null 2>&1
+    # This commit used to be HEAD on the branch "clean", but I needed to tidy up the repo, so I'm using the hash instead of the branch
+    # Now I can delete the branch. The commit is the first commit in the repo and at the root of all branches, so it's not going anywhere.
+    git checkout 6ecbe5790d8b02085359ecba94a6e7f25865503d > /dev/null 2>&1
     git checkout -b $branch > /dev/null 2>&1
 fi
 
