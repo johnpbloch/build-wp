@@ -180,13 +180,10 @@ case $type in
         echo "Tagging $tag in the meta repo"
         git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/wordpress.git" /tmp/wp-git-meta > /dev/null 2>&1
         cd /tmp/wp-git-meta
-        tag_branch="${tag%.*}"
-        exists=$(curl -sS https://api.github.com/repos/johnpbloch/wordpress/branches | jq -r 'map(select(.name == "'$tag_branch'")) | .[0]?.name')
-        git checkout -b $tag_branch
-        if [ "$exists" == "$tag_branch" ]; then
-            git fetch
-            git reset --hard origin/$tag_branch
-        fi
+        ensure_branch_on_meta_repo "$branch"
+        git checkout "$branch"
+        git fetch
+        git reset --hard "origin/$branch"
         cat composer.json | jq '.require."johnpbloch/wordpress-core" = "'$tag'"' > temp && mv temp composer.json
         git add composer.json
         git commit -m "Add $tag tag"
