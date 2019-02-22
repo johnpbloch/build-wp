@@ -152,6 +152,23 @@ fi
 echo "Pushing $branch to origin"
 output="$(git push --tags origin $branch 2>&1)" || exit_on_error 'Git push failed' 4 "$output"
 
+ensure_branch_on_meta_repo(){
+    repo="johnpbloch/wordpress"
+    tmpbranch=${1}
+    branch_status=$(curl -ILs -o /dev/null -w "%{http_code}\n" https://api.github.com/repos/$repo/branches/$tmpbranch)
+    if [ "404" == $branch_status ]; then
+        echo "Adding $tmpbranch branch to the meta repo"
+        cd /tmp
+        git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/$repo.git" /tmp/wp-git-meta > /dev/null 2>&1
+        cd wp-git-meta
+        git checkout -b $tmpbranch
+        cat composer.json | jq '.require."johnpbloch/wordpress-core" = "'$tmpbranch'.x-dev"' > temp && mv temp composer.json
+        git add composer.json
+        git commit -m "Add $tmpbranch branch"
+        git push origin $tmpbranch
+    fi
+}
+
 case $type in
     tag)
         echo "Tagging $tag in the meta repo"
@@ -174,17 +191,6 @@ case $type in
         git push --tags origin $tag_branch
         ;;
     branch)
-        branch_status=$(curl -ILs -o /dev/null -w "%{http_code}\n" https://api.github.com/repos/johnpbloch/wordpress/branches/$branch)
-        if [ "404" == $branch_status ]; then
-            echo "Adding $branch branch to the meta repo"
-            cd /tmp
-            git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/wordpress.git" /tmp/wp-git-meta > /dev/null 2>&1
-            cd wp-git-meta
-            git checkout -b $branch
-            cat composer.json | jq '.require."johnpbloch/wordpress-core" = "'$branch'.x-dev"' > temp && mv temp composer.json
-            git add composer.json
-            git commit -m "Add $branch branch"
-            git push origin $branch
-        fi
+        ensure_branch_on_meta_repo $branch
         ;;
 esac
