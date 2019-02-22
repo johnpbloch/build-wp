@@ -158,9 +158,15 @@ ensure_branch_on_meta_repo(){
     branch_status=$(curl -ILs -o /dev/null -w "%{http_code}\n" https://api.github.com/repos/$repo/branches/$tmpbranch)
     if [ "404" == $branch_status ]; then
         echo "Adding $tmpbranch branch to the meta repo"
-        cd /tmp
-        git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/$repo.git" /tmp/wp-git-meta > /dev/null 2>&1
-        cd wp-git-meta
+        if [ -d /tmp/wp-git-meta ]; then
+            cd /tmp/wp-git-meta
+            git checkout master
+            git reset --hard origin/master
+        else
+            cd /tmp
+            git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/$repo.git" /tmp/wp-git-meta > /dev/null 2>&1
+            cd wp-git-meta
+        fi
         git checkout -b $tmpbranch
         cat composer.json | jq '.require."johnpbloch/wordpress-core" = "'$tmpbranch'.x-dev"' > temp && mv temp composer.json
         git add composer.json
