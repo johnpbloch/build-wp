@@ -142,8 +142,8 @@ if [ -n $tag ]; then
 fi
 
 if [ "tag" == "$type" ]; then
-    git rm composer.json > /dev/null 2>&1
-    git commit -m "Hide tag branch from packagist" > /dev/null 2>&1
+    # Revert the release commit so it stays in history but resets HEAD to previous state
+    git revert --no-edit $(git rev-parse HEAD)
 fi
 
 if [ $tag ]; then
@@ -191,9 +191,7 @@ case $type in
         git add composer.json
         git commit -m "Add $tag tag"
         git tag "$tag"
-        cat composer.json | jq '.require."johnpbloch/wordpress-core" = "'$tag_branch'.x-dev"' > temp && mv temp composer.json
-        git add composer.json
-        git commit -m "Reset $tag_branch branch"
+        git revert --no-edit $(git rev-parse HEAD)
         git push --tags origin $tag_branch
         ;;
     branch)
