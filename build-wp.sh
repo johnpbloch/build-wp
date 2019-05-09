@@ -106,6 +106,7 @@ mv /tmp/wp/build/* .
 cp /var/composer.json .
 chmod 644 ./composer.json
 
+min_php='5.3.2'
 unset tag
 unset provide
 case $type in
@@ -115,15 +116,25 @@ case $type in
             tag="$tag.0"
         fi
         provide="$tag"
+        if [ $((echo '5.2.0'; echo $tag) | sort -V | head -n1) == '5.2.0' ]
+        then
+            min_php='5.6.20'
+        fi
         ;;
     master)
         provide="dev-master"
+        min_php='5.6.20'
         ;;
     branch)
         provide="$branch.x-dev"
+        if [ $((echo '5.2'; echo $branch) | sort -V | head -n1) == '5.2' ]
+        then
+            min_php='5.6.20'
+        fi
         ;;
 esac
 
+jq '.require.php = ">='$min_php'"' ./composer.json > temp && mv temp composer.json
 if [ -n $provide ]; then
     cat composer.json | jq '.provide."wordpress/core-implementation" = "'$provide'"' > temp && mv temp composer.json
 fi
@@ -187,6 +198,7 @@ case $type in
         git fetch
         git reset --hard "origin/$branch"
         cat composer.json | jq '.require."johnpbloch/wordpress-core" = "'$tag'"' > temp && mv temp composer.json
+        cat composer.json | jq '.require.php= "'$min_php'"' > temp && mv temp composer.json
         git add composer.json
         git commit -m "Add $tag tag"
         git tag "$tag"
@@ -195,5 +207,6 @@ case $type in
         ;;
     branch)
         ensure_branch_on_meta_repo $branch
+        cat composer.json | jq '.require.php= "'$min_php'"' > temp && mv temp composer.json
         ;;
 esac
