@@ -104,7 +104,8 @@ git config --global user.name "John P Bot" > /dev/null 2>&1
 mv /tmp/wp/build/* .
 
 cp /var/composer.json .
-chmod 644 ./composer.json
+find . -type f -exec chmod 644 {} \;
+find . -type d -exec chmod 755 {} \;
 
 min_php='5.3.2'
 unset tag
