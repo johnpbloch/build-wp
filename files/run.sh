@@ -315,7 +315,7 @@ function get_meta_vcs() {
 ##############################################################
 function run(){
   checkenv
-  git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/wordpress.git" /tmp/wp-build > /dev/null 2>&1
+  git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/build-wp.git" /tmp/wp-build > /dev/null 2>&1
   cd /tmp/wp-build
   # Grab all branches from upstream
   ALL_BRANCHES=$(git ls-remote --heads https://github.com/wordpress/wordpress.git | awk '{print $1","$2}')
