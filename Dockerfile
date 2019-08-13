@@ -1,21 +1,15 @@
-FROM alpine:3.5
+FROM ubuntu:18.04
 
-RUN apk add --no-cache \
-    git \
-    subversion \
-    bash \
-    python \
-    php5-cli \
-    curl \
-    jq
-
-COPY build-wp.sh /bin/build-wp
-
-RUN chmod +x /bin/build-wp
+COPY run.sh /bin/run-wp-build
 
 COPY files/composer.json /var/composer.json
+
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y git curl jq && \
+    chmod +x /bin/run-wp-build
 
 ENV GITHUB_AUTH_USER=""
 ENV GITHUB_AUTH_PW=""
 
-ENTRYPOINT ["/bin/build-wp"]
+ENTRYPOINT ["/bin/run-wp-build"]
