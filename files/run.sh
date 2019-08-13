@@ -335,14 +335,17 @@ function run(){
     branch=$(echo $ref | cut -d, -f2 | sed 's=refs/heads/\(.*\)-branch=\1=')
     hash=$(echo $ref | cut -d, -f1)
     if [ "refs/heads/master" == $branch ] && [ hash != $(cat branches/master) ]; then
+      echo "Building trunk..."
       build_trunk && (echo $hash > branches/master)
     elif [ $hash != $(cat branches/$branch) ]; then
+      echo "Building branch $branch..."
       build_branch $branch && (echo $hash > branches/$branch)
     fi
   done
 
   for tag in $TAGS_TO_BUILD ; do
     cd /tmp/wp-build
+    echo "Building release $tag..."
     build_tag $tag
   done
 
