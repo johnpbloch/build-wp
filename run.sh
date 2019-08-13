@@ -10,6 +10,7 @@ function build_trunk() {
   get_vcs master
   update_repo
   add_provide dev-master
+  set_php_requirement /tmp/wp-fork '5.6.20'
   if nothing_to_commit ; then
     return 2
   fi
@@ -34,6 +35,9 @@ function build_branch() {
   get_vcs $branch
   update_repo
   add_provide "$branch.x-dev"
+  if is_version_greater_than $branch '5.1.999999'; then
+    set_php_requirement /tmp/wp-fork '5.6.20'
+  fi
   if nothing_to_commit ; then
     return 2
   fi
@@ -47,6 +51,9 @@ function build_branch() {
   pushd /tmp/wp-fork-meta > /dev/null 2>&1
   git checkout -b $branch
   cat composer.json | jq '.require."johnpbloch/wordpress-core" = "'$branch'.x-dev"' > temp && mv temp composer.json
+  if is_version_greater_than $branch '5.1.999999'; then
+    set_php_requirement /tmp/wp-fork-meta '5.6.20'
+  fi
   git add composer.json
   git commit -m "Add $branch branch"
   git push origin $branch
@@ -77,6 +84,11 @@ function build_tag() {
   get_vcs clean
   update_repo
   add_provide $tag
+  if is_version_greater_than $tag '5.1.999999'; then
+    set_php_requirement /tmp/wp-fork '5.6.20'
+  elif is_version_greater_than '5.2' $tag; then
+    set_php_requirement /tmp/wp-fork '5.3.2'
+  fi
   if nothing_to_commit ; then
     return 2
   fi
@@ -87,6 +99,11 @@ function build_tag() {
   pushd /tmp/wp-fork-meta > /dev/null 2>&1
   git reset --hard origin/master
   cat composer.json | jq '.require."johnpbloch/wordpress-core" = "'$tag'"' > temp && mv temp composer.json
+  if is_version_greater_than $tag '5.1.999999'; then
+    set_php_requirement /tmp/wp-fork '5.6.20'
+  elif is_version_greater_than '5.2' $tag; then
+    set_php_requirement /tmp/wp-fork '5.3.2'
+  fi
   git add composer.json
   git commit -m "Add $tag tag"
   git tag "$tag"
@@ -208,6 +225,26 @@ function get_vcs() {
 function add_provide() {
   cat /tmp/wp-fork/composer.json | jq '.provide."wordpress/core-implementation" = "'$1'"' > /tmp/temp.json && \
     mv /tmp/temp.json /tmp/wp-fork/composer.json
+}
+
+##############################################################
+# Check if one version is greater than another               #
+##############################################################
+function is_version_greater_than() {
+  test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"
+}
+
+##############################################################
+# Set the minimum php version in a composer.json file        #
+# This function expects 2 arguments:                         #
+#   - The directory in which to find composer.json           #
+#   - The minimum php version to use                         #
+##############################################################
+function set_php_requirement() {
+  dir=$1
+  ver=$2
+  cat $dir/composer.json | jq '.require.php = ">='$ver'"' > /tmp/temp.json && \
+    mv /tmp/temp.json $dir/composer.json
 }
 
 ##############################################################
