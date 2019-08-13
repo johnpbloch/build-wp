@@ -266,6 +266,11 @@ function get_meta_vcs() {
 ##############################################################
 # Run the update process                                     #
 #                                                            #
+# Before updating the fork repos, this checks out the build  #
+# repo to track changes necessary. Hashes are stored for     #
+# branches and if the hash hasn't changed, there's really no #
+# reason to update it.                                       #
+#                                                            #
 # First, this loops through the branches and builds them     #
 # accordingly. Next, it computes the tags that exist in the  #
 # upstream repository but not in the local repo and adds     #
@@ -273,6 +278,8 @@ function get_meta_vcs() {
 ##############################################################
 function run(){
   checkenv
+  git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/wordpress.git" /tmp/wp-build > /dev/null 2>&1
+  cd /tmp/wp-build
   # Grab all branches from upstream
   ALL_BRANCHES=$(git ls-remote --heads https://github.com/wordpress/wordpress.git | awk '{print $1","$2}')
   # Grab all tags from upstream
@@ -287,6 +294,7 @@ function run(){
   TAGS_TO_BUILD=$(comm -23 <(echo $UPSTREAM_TAGS) <(echo $LOCAL_TAGS) )
 
   for ref in $ALL_BRANCHES ; do
+    cd /tmp/wp-build
     branch=$(echo $ref | cut -d, -f2 | sed 's=refs/heads/\(.*\)-branch=\1=')
     hash=$(echo $ref | cut -d, -f1)
     if [ "refs/heads/master" == $branch ] && [ hash != $(cat branches/master) ]; then
@@ -297,6 +305,7 @@ function run(){
   done
 
   for tag in $TAGS_TO_BUILD ; do
+    cd /tmp/wp-build
     build_tag $tag
   done
 }
