@@ -334,9 +334,11 @@ function run(){
     cd /tmp/wp-build
     branch=$(echo $ref | cut -d, -f2 | sed 's=refs/heads/\(.*\)-branch=\1=')
     hash=$(echo $ref | cut -d, -f1)
-    if [ "refs/heads/master" == "$branch" ] && [ "$hash" != "$(cat branches/master)" ]; then
-      echo "Building trunk..."
-      build_trunk && (echo $hash > /tmp/wp-build/branches/master)
+    if [ "refs/heads/master" == "$branch" ] ; then
+      if [ "$hash" != "$(cat branches/master)" ]; then
+        echo "Building trunk..."
+        build_trunk && (echo $hash > /tmp/wp-build/branches/master)
+      fi
     elif [ "$hash" != "$(cat branches/$branch)" ]; then
       echo "Building branch $branch..."
       build_branch $branch && (echo $hash > /tmp/wp-build/branches/$branch)
