@@ -6,7 +6,7 @@ ENV GITHUB_AUTH_PW=""
 COPY files/ /tmp/files/
 
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y git curl jq && \
+    apt-get install --no-install-recommends -y git curl jq ca-certificates && \
     mv /tmp/files/run.sh /bin/run-wp-build && \
     mv /tmp/files/composer.json /var/composer.json && \
     rm -rf /tmp/files && \
