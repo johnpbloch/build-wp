@@ -202,8 +202,6 @@ function update_repo() {
 function get_vcs() {
   if [ ! -d "/tmp/wp-fork" ]; then
     git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/wordpress-core.git" /tmp/wp-fork > /dev/null 2>&1
-    git config --global user.email "johnpbloch+ghbot@gmail.com" > /dev/null 2>&1
-    git config --global user.name "John P Bot" > /dev/null 2>&1
   fi
   pushd /tmp/wp-fork > /dev/null 2>&1
   branch=$1
@@ -315,6 +313,8 @@ function get_meta_vcs() {
 ##############################################################
 function run(){
   checkenv
+  git config --global user.email "johnpbloch+ghbot@gmail.com" > /dev/null 2>&1
+  git config --global user.name "John P Bot" > /dev/null 2>&1
   git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/build-wp.git" /tmp/wp-build > /dev/null 2>&1
   cd /tmp/wp-build
   # Grab all branches from upstream
