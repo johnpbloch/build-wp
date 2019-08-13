@@ -26,7 +26,7 @@ function build_branch() {
   branch=$1
   branch_archive="https://github.com/WordPress/WordPress/archive/${branch}-branch.tar.gz"
   archive_status=$(curl -ILs -o /dev/null -w "%{http_code}\n" $branch_archive)
-  if [ "200" != $archive_status ]; then
+  if [ "200" != "$archive_status" ]; then
     echo "Archive $branch does not exist yet!"
     return 1
   fi
@@ -44,7 +44,7 @@ function build_branch() {
   commit_changes
   push_ref $branch
   branch_status=$(curl -ILs -o /dev/null -w "%{http_code}\n" https://api.github.com/repos/johnpbloch/wordpress/branches/$branch)
-  if [ "200" == $branch_status ]; then
+  if [ "200" == "$branch_status" ]; then
     return 0
   fi
   get_meta_vcs
@@ -75,7 +75,7 @@ function build_tag() {
   short_tag=$(echo $tag | sed -E 's=^([0-9]+\.[0-9]+)\.0$=\1=')
   tag_archive="https://wordpress.org/wordpress-$short_tag.tar.gz"
   tag_status=$(curl -Is -o /dev/null -w "%{http_code}\n" $tag_archive)
-  if [ "200" != $tag_status ]; then
+  if [ "200" != "$tag_status" ]; then
     echo "Tag $tag does not have an archive yet!"
     return 1
   fi
@@ -139,13 +139,13 @@ exit_on_error(){
 # Clean up the filesystem before attempting to build         #
 ##############################################################
 function clean() {
-  if [ -e ./wordpress.tar.gz ]; then
+  if [ -e './wordpress.tar.gz' ]; then
     rm -f ./wordpress.tar.gz
   fi
-  if [ -e ./wordpress ]; then
+  if [ -e './wordpress' ]; then
     rm -rf ./wordpress
   fi
-  if [ -e /tmp/wp ]; then
+  if [ -e '/tmp/wp' ]; then
     rm -rf /tmp/wp
   fi
 }
@@ -211,7 +211,7 @@ function get_vcs() {
     git checkout -b "$branch" "origin/$branch" > /dev/null 2>&1
   else
     git checkout 6ecbe57 > /dev/null 2>&1
-    if [ "clean" != $branch ]; then
+    if [ "clean" != "$branch" ]; then
       git checkout -b $branch > /dev/null 2>&1
     fi
   fi
@@ -254,7 +254,7 @@ function nothing_to_commit() {
   pushd /tmp/wp-fork > /dev/null 2>&1
   change_count=$(git status -s | wc -l)
   popd > /dev/null 2>&1
-  if [ $change_count -ge  1 ]; then
+  if [ "$change_count" -ge  1 ]; then
     return 1
   fi
   return 0
@@ -334,10 +334,10 @@ function run(){
     cd /tmp/wp-build
     branch=$(echo $ref | cut -d, -f2 | sed 's=refs/heads/\(.*\)-branch=\1=')
     hash=$(echo $ref | cut -d, -f1)
-    if [ "refs/heads/master" == $branch ] && [ hash != $(cat branches/master) ]; then
+    if [ "refs/heads/master" == "$branch" ] && [ "$hash" != "$(cat branches/master)" ]; then
       echo "Building trunk..."
       build_trunk && (echo $hash > branches/master)
-    elif [ $hash != $(cat branches/$branch) ]; then
+    elif [ "$hash" != "$(cat branches/$branch)" ]; then
       echo "Building branch $branch..."
       build_branch $branch && (echo $hash > branches/$branch)
     fi
