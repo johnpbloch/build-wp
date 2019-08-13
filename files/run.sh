@@ -336,10 +336,10 @@ function run(){
     hash=$(echo $ref | cut -d, -f1)
     if [ "refs/heads/master" == "$branch" ] && [ "$hash" != "$(cat branches/master)" ]; then
       echo "Building trunk..."
-      build_trunk && (echo $hash > branches/master)
+      build_trunk && (echo $hash > /tmp/wp-build/branches/master)
     elif [ "$hash" != "$(cat branches/$branch)" ]; then
       echo "Building branch $branch..."
-      build_branch $branch && (echo $hash > branches/$branch)
+      build_branch $branch && (echo $hash > /tmp/wp-build/branches/$branch)
     fi
   done
 
@@ -350,6 +350,7 @@ function run(){
   done
 
   cd /tmp/wp-build
+  clean
   git add branches && git commit -m "Update hashes" && git push
 }
 
