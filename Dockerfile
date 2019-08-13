@@ -1,5 +1,8 @@
 FROM ubuntu:18.04
 
+ENV GITHUB_AUTH_USER=""
+ENV GITHUB_AUTH_PW=""
+
 COPY files/ /tmp/files/
 
 RUN apt-get update && \
@@ -9,8 +12,5 @@ RUN apt-get update && \
     mv /tmp/files/composer.json /var/composer.json && \
     rm -rf /tmp/files && \
     chmod +x /bin/run-wp-build
-
-ENV GITHUB_AUTH_USER=""
-ENV GITHUB_AUTH_PW=""
 
 ENTRYPOINT ["/bin/run-wp-build"]
