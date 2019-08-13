@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+##############################################################
+# Build Trunk                                                #
+##############################################################
 function build_trunk() {
   clean
   archive="https://github.com/WordPress/WordPress/archive/master.tar.gz"
@@ -14,6 +17,10 @@ function build_trunk() {
   push_ref master
 }
 
+##############################################################
+# Build Branch                                               #
+# Takes 1 argument: branch name                              #
+##############################################################
 function build_branch() {
   branch=$1
   branch_archive="https://github.com/WordPress/WordPress/archive/${branch}-branch.tar.gz"
@@ -46,6 +53,16 @@ function build_branch() {
   popd > /dev/null 2>&1
 }
 
+##############################################################
+# Build Tag                                                  #
+# Takes one argument: tag name                               #
+#                                                            #
+# Tag name is normalized to always include 3 version         #
+# numbers. By default, WordPress does not include .0 at the  #
+# end of the first tagged release in a major version's       #
+# lifecycle. This function expects those tags to have the .0 #
+# added to the end of the tag before invocation.             #
+##############################################################
 function build_tag() {
   tag=$1
   short_tag=$(echo $tag | sed -E 's=^([0-9]+\.[0-9]+)\.0$=\1=')
@@ -77,6 +94,11 @@ function build_tag() {
   popd > /dev/null 2>&1
 }
 
+##############################################################
+# Check Environment                                          #
+# Makes sure we have the necessary environment variables set #
+# to push these changes up to the remote.                    #
+##############################################################
 function checkenv() {
   if [ -z "$GITHUB_AUTH_USER" ]; then
     echo 'You must define the GITHUB_AUTH_USER environment variable!'
@@ -96,6 +118,9 @@ exit_on_error(){
     exit $2
 }
 
+##############################################################
+# Clean up the filesystem before attempting to build         #
+##############################################################
 function clean() {
   if [ -e ./wordpress.tar.gz ]; then
     rm -f ./wordpress.tar.gz
@@ -108,6 +133,17 @@ function clean() {
   fi
 }
 
+##############################################################
+# Download WordPress and extract it                          #
+# This takes 1 to 2 arguments:                               #
+#   - The archive URL                                        #
+#   - An optional flag to identify this archive as coming    #
+#     from github (and therefore needing special handling    #
+# The mere presence of a second argument will trigger the    #
+# github handling. If an archive is flagged as a github file #
+# it will be extracted with strip-components set to one to   #
+# make sure the file is extracted into the correct location. #
+##############################################################
 function get_download() {
   archive=$1
   curl -sSL $archive > ./wordpress.tar.gz
@@ -121,6 +157,9 @@ function get_download() {
   mv ./wordpress /tmp/wp/build
 }
 
+##############################################################
+# Update the Local repo with the latest code from upstream   #
+##############################################################
 function update_repo() {
   pushd /tmp/wp-fork > /dev/null 2>&1
   if [ -e 'index.php' ]; then
@@ -136,6 +175,13 @@ function update_repo() {
   popd > /dev/null 2>&1
 }
 
+##############################################################
+# Ensure the local vcs repo is in the correct state          #
+# This takes one argument: the branch to switch to           #
+# If the branch is "clean", rather than a branch, it will    #
+# check out commit 6ecbe57 in a detached head state and stay #
+# there.                                                     #
+##############################################################
 function get_vcs() {
   if [ ! -d "/tmp/wp-fork" ]; then
     git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/wordpress-core.git" /tmp/wp-fork > /dev/null 2>&1
@@ -155,11 +201,18 @@ function get_vcs() {
   popd > /dev/null 2>&1
 }
 
+##############################################################
+# Add a "provide" section to the composer.json file          #
+# This takes 1 argument: the version constraint provided     #
+##############################################################
 function add_provide() {
   cat /tmp/wp-fork/composer.json | jq '.provide."wordpress/core-implementation" = "'$1'"' > /tmp/temp.json && \
     mv /tmp/temp.json /tmp/wp-fork/composer.json
 }
 
+##############################################################
+# Check if the working tree is clean for the local repo      #
+##############################################################
 function nothing_to_commit() {
   pushd /tmp/wp-fork > /dev/null 2>&1
   change_count=$(git status -s | wc -l)
@@ -170,6 +223,9 @@ function nothing_to_commit() {
   return 0
 }
 
+##############################################################
+# Commit the changes currently in the local repo             #
+##############################################################
 function commit_changes() {
   pushd /tmp/wp-fork > /dev/null 2>&1
   git add -A . > /dev/null 2>&1
@@ -177,12 +233,20 @@ function commit_changes() {
   popd > /dev/null 2>&1
 }
 
+##############################################################
+# Create a git tag                                           #
+##############################################################
 function create_git_tag() {
   pushd /tmp/wp-fork > /dev/null 2>&1
   git tag $1 > /dev/null 2>&1
   popd > /dev/null 2>&1
 }
 
+##############################################################
+# Push a ref to origin                                       #
+# This takes 1 argument: the refspec to push                 #
+# The refspec could be either a branch or a tag              #
+##############################################################
 function push_ref() {
   ref=$1
   pushd /tmp/wp-fork > /dev/null 2>&1
@@ -190,12 +254,23 @@ function push_ref() {
   popd > /dev/null 2>&1
 }
 
+##############################################################
+# Ensure the meta repository exists                          #
+##############################################################
 function get_meta_vcs() {
   if [ ! -d "/tmp/wp-fork-meta" ]; then
     git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/wordpress.git" /tmp/wp-fork-meta > /dev/null 2>&1
   fi
 }
 
+##############################################################
+# Run the update process                                     #
+#                                                            #
+# First, this loops through the branches and builds them     #
+# accordingly. Next, it computes the tags that exist in the  #
+# upstream repository but not in the local repo and adds     #
+# the missing tags.                                          #
+##############################################################
 function run(){
   checkenv
   # Grab all branches from upstream
