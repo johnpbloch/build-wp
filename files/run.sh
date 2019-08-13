@@ -354,6 +354,8 @@ function run(){
   cd /tmp/wp-build
   clean
   git add branches && git commit -m "Update hashes" && git push
+
+  echo 'Done!';
 }
 
 run
