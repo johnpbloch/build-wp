@@ -117,11 +117,11 @@ function build_tag() {
 # to push these changes up to the remote.                    #
 ##############################################################
 function checkenv() {
-  if [ -z "$GITHUB_AUTH_USER" ]; then
-    echo 'You must define the GITHUB_AUTH_USER environment variable!'
+  if [ -z "$VCS_AUTH_USER" ]; then
+    echo 'You must define the VCS_AUTH_USER environment variable!'
     exit 2
-  elif [ -z "$GITHUB_AUTH_PW" ]; then
-    echo 'You must define the GITHUB_AUTH_PW environment variable!'
+  elif [ -z "$VCS_AUTH_PW" ]; then
+    echo 'You must define the VCS_AUTH_PW environment variable!'
     exit 2
   fi
 }
@@ -201,7 +201,7 @@ function update_repo() {
 ##############################################################
 function get_vcs() {
   if [ ! -d "/tmp/wp-fork" ]; then
-    git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/wordpress-core.git" /tmp/wp-fork > /dev/null 2>&1
+    git clone "https://$VCS_AUTH_USER:$VCS_AUTH_PW@github.com/johnpbloch/wordpress-core.git" /tmp/wp-fork > /dev/null 2>&1
   fi
   pushd /tmp/wp-fork > /dev/null 2>&1
   branch=$1
@@ -294,7 +294,7 @@ function push_ref() {
 ##############################################################
 function get_meta_vcs() {
   if [ ! -d "/tmp/wp-fork-meta" ]; then
-    git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/wordpress.git" /tmp/wp-fork-meta > /dev/null 2>&1
+    git clone "https://$VCS_AUTH_USER:$VCS_AUTH_PW@github.com/johnpbloch/wordpress.git" /tmp/wp-fork-meta > /dev/null 2>&1
   fi
 }
 
@@ -315,7 +315,7 @@ function run(){
   checkenv
   git config --global user.email "johnpbloch+ghbot@gmail.com" > /dev/null 2>&1
   git config --global user.name "John P Bot" > /dev/null 2>&1
-  git clone "https://$GITHUB_AUTH_USER:$GITHUB_AUTH_PW@github.com/johnpbloch/build-wp.git" /tmp/wp-build > /dev/null 2>&1
+  git clone "https://$VCS_AUTH_USER:$VCS_AUTH_PW@github.com/johnpbloch/build-wp.git" /tmp/wp-build > /dev/null 2>&1
   cd /tmp/wp-build
   # Grab all branches from upstream
   ALL_BRANCHES=$(git ls-remote --heads https://github.com/wordpress/wordpress.git | awk '{print $1","$2}')

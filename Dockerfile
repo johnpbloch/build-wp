@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 
-ENV GITHUB_AUTH_USER=""
-ENV GITHUB_AUTH_PW=""
+ENV VCS_AUTH_USER=""
+ENV VCS_AUTH_PW=""
 
 COPY files/ /tmp/files/
 
