@@ -308,6 +308,9 @@ function run(){
     cd /tmp/wp-build
     build_tag $tag
   done
+
+  cd /tmp/wp-build
+  git add branches && git commit -m "Update hashes" && git push
 }
 
 run
