@@ -322,13 +322,13 @@ function run(){
   # Grab all tags from upstream
   UPSTREAM_TAGS=$(git ls-remote --tags https://github.com/wordpress/wordpress.git | awk '{print $2}' | sed 's=refs/tags/==')
   # Add trailing zeroes to x.x releases to be consistent with local tagging convention
-  UPSTREAM_TAGS=$(echo $UPSTREAM_TAGS | sed -E 's=^([0-9]+\.[0-9]+)$=\1.0=')
+  UPSTREAM_TAGS=$(echo "${UPSTREAM_TAGS}" | sed -E 's=^([0-9]+\.[0-9]+)$=\1.0=')
   # Get rid of 5.0.5. See https://github.com/johnpbloch/wordpress/issues/41
-  UPSTREAM_TAGS=$(echo $UPSTREAM_TAGS | grep -Pv '^5\.0\.5$');
+  UPSTREAM_TAGS=$(echo "${UPSTREAM_TAGS}" | grep -Pv '^5\.0\.5$')
   # Get all tags already in the local repo
   LOCAL_TAGS=$(git ls-remote --tags https://github.com/johnpbloch/wordpress-core.git | awk '{print $2}' | sed 's=refs/tags/==')
   # Compute all tags in upstream, but not in local
-  TAGS_TO_BUILD=$(comm -23 <(echo $UPSTREAM_TAGS) <(echo $LOCAL_TAGS) )
+  TAGS_TO_BUILD=$(comm -23 <(echo "${UPSTREAM_TAGS}") <(echo "${LOCAL_TAGS}") )
 
   for ref in $ALL_BRANCHES ; do
     cd /tmp/wp-build
