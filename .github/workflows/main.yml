@@ -1,0 +1,16 @@
+name: Build Periodically
+
+on:
+  schedule:
+  - cron: '*/15 * * * *'
+
+jobs:
+  build:
+    name: Build All
+    runs-on: ubuntu-latest
+    steps:
+    - name: Build
+      uses: docker://johnpbloch/build-wp:latest
+      env:
+        VCS_AUTH_USER: johnpbloch-bot
+        VCS_AUTH_PW: ${{ secrets.VCS_AUTH_PW }}
