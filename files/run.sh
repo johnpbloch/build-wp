@@ -205,7 +205,11 @@ function get_vcs() {
   fi
   pushd /tmp/wp-fork > /dev/null 2>&1
   branch=$1
-  if [[ `git branch -a | grep -E "remotes/origin/$branch$"` ]]; then
+  if [ "$branch" == "master" ]; then
+    git checkout master > /dev/null 2>&1
+    git fetch > /dev/null 2>&1
+    git reset --hard origin/master > /dev/null 2>&1
+  elif [[ `git branch -a | grep -E "remotes/origin/$branch$"` ]]; then
     git checkout -b "$branch" "origin/$branch" > /dev/null 2>&1
   else
     git checkout 6ecbe57 > /dev/null 2>&1
