@@ -339,8 +339,8 @@ function run(){
         echo "Building trunk..."
         build_trunk && (echo $hash > /tmp/wp-build/branches/master)
       fi
-    elif [ "$branch" == "refs/heads/5.3" ] ; then
-      # Skip bad branch name
+    elif [ "$branch" == "refs/heads/5.3" ]; then
+      : # Skip bad branch name
     elif [ "$hash" != "$(cat branches/$branch)" ]; then
       echo "Building branch $branch..."
       build_branch $branch && (echo $hash > /tmp/wp-build/branches/$branch)
