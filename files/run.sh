@@ -11,6 +11,7 @@ function build_trunk() {
   update_repo
   add_provide dev-master
   set_php_requirement /tmp/wp-fork '5.6.20'
+  require_ext_json /tmp/wp-fork
   if nothing_to_commit ; then
     return 2
   fi
@@ -37,6 +38,9 @@ function build_branch() {
   add_provide "$branch.x-dev"
   if is_version_greater_than $branch '5.1.999999'; then
     set_php_requirement /tmp/wp-fork '5.6.20'
+  fi
+  if is_version_greater_than $branch '5.2.999999'; then
+    require_ext_json /tmp/wp-fork
   fi
   if nothing_to_commit ; then
     return 2
@@ -88,6 +92,9 @@ function build_tag() {
     set_php_requirement /tmp/wp-fork '5.6.20'
   elif is_version_greater_than '5.2' $tag; then
     set_php_requirement /tmp/wp-fork '5.3.2'
+  fi
+  if is_version_greater_than $tag '5.2.999999'; then
+    require_ext_json /tmp/wp-fork
   fi
   if nothing_to_commit ; then
     return 2
@@ -246,6 +253,15 @@ function set_php_requirement() {
   dir=$1
   ver=$2
   cat $dir/composer.json | jq '.require.php = ">='$ver'"' > /tmp/temp.json && \
+    mv /tmp/temp.json $dir/composer.json
+}
+
+##############################################################
+# Add ext-json to the composer require object                #
+##############################################################
+function require_ext_json() {
+  dir=$1
+  cat $dir/composer.json | jq '.require."ext-json" = "*"' > /tmp/temp.json && \
     mv /tmp/temp.json $dir/composer.json
 }
 
