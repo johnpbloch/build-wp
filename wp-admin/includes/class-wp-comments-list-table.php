@@ -547,7 +547,7 @@ class WP_Comments_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Get the name of the default primary column.
+	 * Gets the name of the default primary column.
 	 *
 	 * @since 4.3.0
 	 *
@@ -648,7 +648,7 @@ class WP_Comments_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Generate and display row actions links.
+	 * Generates and displays row actions links.
 	 *
 	 * @since 4.3.0
 	 * @since 5.9.0 Renamed `$comment` to `$item` to match parent class for PHP 8 named parameter support.
@@ -917,9 +917,9 @@ class WP_Comments_List_Table extends WP_List_Table {
 			?>
 		<div id="inline-<?php echo $comment->comment_ID; ?>" class="hidden">
 			<textarea class="comment" rows="1" cols="1"><?php echo esc_textarea( $comment_content ); ?></textarea>
-			<div class="author-email"><?php echo esc_attr( $comment->comment_author_email ); ?></div>
-			<div class="author"><?php echo esc_attr( $comment->comment_author ); ?></div>
-			<div class="author-url"><?php echo esc_attr( $comment->comment_author_url ); ?></div>
+			<div class="author-email"><?php echo esc_html( $comment->comment_author_email ); ?></div>
+			<div class="author"><?php echo esc_html( $comment->comment_author ); ?></div>
+			<div class="author-url"><?php echo esc_url( $comment->comment_author_url ); ?></div>
 			<div class="comment_status"><?php echo $comment->comment_approved; ?></div>
 		</div>
 			<?php
@@ -947,7 +947,12 @@ class WP_Comments_List_Table extends WP_List_Table {
 		echo '</strong><br />';
 
 		if ( ! empty( $author_url_display ) ) {
-			printf( '<a href="%s">%s</a><br />', esc_url( $author_url ), esc_html( $author_url_display ) );
+			// Print link to author URL, and disallow referrer information (without using target="_blank").
+			printf(
+				'<a href="%s" rel="noopener noreferrer">%s</a><br />',
+				esc_url( $author_url ),
+				esc_html( $author_url_display )
+			);
 		}
 
 		if ( $this->user_can ) {
@@ -1067,7 +1072,7 @@ class WP_Comments_List_Table extends WP_List_Table {
 		 * @since 2.8.0
 		 *
 		 * @param string $column_name The custom column's name.
-		 * @param int    $comment_id  The custom column's unique ID number.
+		 * @param string $comment_id  The comment ID as a numeric string.
 		 */
 		do_action( 'manage_comments_custom_column', $column_name, $item->comment_ID );
 	}
