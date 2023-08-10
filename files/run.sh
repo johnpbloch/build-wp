@@ -187,7 +187,7 @@ function get_download() {
 function update_repo() {
   pushd /tmp/wp-fork > /dev/null 2>&1
   if [ -e 'index.php' ]; then
-    rm -rf $(ls -1A | grep -vE '^\.git')
+    rm -rf $(ls -1A --color=never | grep -vE '^\.git')
   fi
   find /tmp/wp/build -type f | xargs chmod 644
   find /tmp/wp/build -type d | xargs chmod 755
