@@ -380,4 +380,4 @@ function run(){
   echo 'Done!';
 }
 
-run
+(return 0 2>/dev/null) || run
