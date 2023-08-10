@@ -254,6 +254,9 @@ function set_php_requirement() {
     return 1
   fi
   ver=$(php -r 'require "'$dir'/wp-includes/version.php"; echo $required_php_version . PHP_EOL;')
+  if is_version_greater_than "5.3.2" "$ver"; then
+    ver="5.3.2"
+  fi
   cat $dir/composer.json | jq '.require.php = ">='$ver'"' > /tmp/temp.json && \
     mv /tmp/temp.json $dir/composer.json
 }
