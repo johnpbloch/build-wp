@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 
 ENV VCS_AUTH_USER=""
 ENV VCS_AUTH_PW=""
