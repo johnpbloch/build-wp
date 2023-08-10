@@ -10,7 +10,7 @@ function build_trunk() {
   get_vcs master
   update_repo
   add_provide dev-master
-  set_php_requirement /tmp/wp-fork '5.6.20'
+  set_php_requirement /tmp/wp-fork
   require_ext_json /tmp/wp-fork
   if nothing_to_commit ; then
     return 2
@@ -36,9 +36,7 @@ function build_branch() {
   get_vcs $branch
   update_repo
   add_provide "$branch.x-dev"
-  if is_version_greater_than $branch '5.1.999999'; then
-    set_php_requirement /tmp/wp-fork '5.6.20'
-  fi
+  set_php_requirement /tmp/wp-fork
   if is_version_greater_than $branch '5.2.999999'; then
     require_ext_json /tmp/wp-fork
   fi
@@ -55,9 +53,7 @@ function build_branch() {
   pushd /tmp/wp-fork-meta > /dev/null 2>&1
   git checkout -b $branch
   cat composer.json | jq '.require."johnpbloch/wordpress-core" = "'$branch'.x-dev"' > temp && mv temp composer.json
-  if is_version_greater_than $branch '5.1.999999'; then
-    set_php_requirement /tmp/wp-fork-meta '5.6.20'
-  fi
+  set_php_requirement /tmp/wp-fork-meta
   git add composer.json
   git commit -m "Add $branch branch"
   git push origin $branch
@@ -88,11 +84,7 @@ function build_tag() {
   get_vcs clean
   update_repo
   add_provide $tag
-  if is_version_greater_than $tag '5.1.999999'; then
-    set_php_requirement /tmp/wp-fork '5.6.20'
-  elif is_version_greater_than '5.2' $tag; then
-    set_php_requirement /tmp/wp-fork '5.3.2'
-  fi
+  set_php_requirement /tmp/wp-fork
   if is_version_greater_than $tag '5.2.999999'; then
     require_ext_json /tmp/wp-fork
   fi
@@ -106,11 +98,7 @@ function build_tag() {
   pushd /tmp/wp-fork-meta > /dev/null 2>&1
   git reset --hard origin/master
   cat composer.json | jq '.require."johnpbloch/wordpress-core" = "'$tag'"' > temp && mv temp composer.json
-  if is_version_greater_than $tag '5.1.999999'; then
-    set_php_requirement /tmp/wp-fork '5.6.20'
-  elif is_version_greater_than '5.2' $tag; then
-    set_php_requirement /tmp/wp-fork '5.3.2'
-  fi
+  set_php_requirement /tmp/wp-fork-meta
   git add composer.json
   git commit -m "Add $tag tag"
   git tag "$tag"
@@ -254,16 +242,18 @@ function is_version_greater_than() {
 
 ##############################################################
 # Set the minimum php version in a composer.json file        #
-# This function expects 2 arguments:                         #
+# This function expects 1 argument:                          #
 #   - The directory in which to find composer.json           #
-#   - The minimum php version to use                         #
 ##############################################################
 function set_php_requirement() {
   dir=$1
-  ver=$2
   if [ ! -d $dir ]; then
     return 1
   fi
+  if [ ! -e "$dir/wp-includes/version.php" ]; then
+    return 1
+  fi
+  ver=$(php -r 'require "'$dir'/wp-includes/version.php"; echo $required_php_version . PHP_EOL;')
   cat $dir/composer.json | jq '.require.php = ">='$ver'"' > /tmp/temp.json && \
     mv /tmp/temp.json $dir/composer.json
 }
