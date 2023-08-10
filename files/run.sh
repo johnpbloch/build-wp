@@ -185,6 +185,9 @@ function get_download() {
 # Update the Local repo with the latest code from upstream   #
 ##############################################################
 function update_repo() {
+  if [ ! -d /tmp/wp-fork ]; then
+    return 1
+  fi
   pushd /tmp/wp-fork > /dev/null 2>&1
   if [ -e 'index.php' ]; then
     rm -rf $(ls -1A --color=never | grep -vE '^\.git')
@@ -210,6 +213,9 @@ function get_vcs() {
   if [ ! -d "/tmp/wp-fork" ]; then
     git clone "https://$VCS_AUTH_USER:$VCS_AUTH_PW@github.com/johnpbloch/wordpress-core.git" /tmp/wp-fork > /dev/null 2>&1
   fi
+  if [ ! -d /tmp/wp-fork ]; then
+    return 1
+  fi
   pushd /tmp/wp-fork > /dev/null 2>&1
   branch=$1
   if [ "$branch" == "master" ]; then
@@ -232,6 +238,9 @@ function get_vcs() {
 # This takes 1 argument: the version constraint provided     #
 ##############################################################
 function add_provide() {
+  if [ ! -d /tmp/wp-fork ]; then
+    return 1
+  fi
   cat /tmp/wp-fork/composer.json | jq '.provide."wordpress/core-implementation" = "'$1'"' > /tmp/temp.json && \
     mv /tmp/temp.json /tmp/wp-fork/composer.json
 }
@@ -252,15 +261,23 @@ function is_version_greater_than() {
 function set_php_requirement() {
   dir=$1
   ver=$2
+  if [ ! -d $dir ]; then
+    return 1
+  fi
   cat $dir/composer.json | jq '.require.php = ">='$ver'"' > /tmp/temp.json && \
     mv /tmp/temp.json $dir/composer.json
 }
 
 ##############################################################
 # Add ext-json to the composer require object                #
+# This function expects 1 argument:                          #
+#   - The directory in which to find composer.json           #
 ##############################################################
 function require_ext_json() {
   dir=$1
+  if [ ! -d $dir ]; then
+    return 1
+  fi
   cat $dir/composer.json | jq '.require."ext-json" = "*"' > /tmp/temp.json && \
     mv /tmp/temp.json $dir/composer.json
 }
@@ -269,6 +286,9 @@ function require_ext_json() {
 # Check if the working tree is clean for the local repo      #
 ##############################################################
 function nothing_to_commit() {
+  if [ ! -d /tmp/wp-fork ]; then
+    return 0
+  fi
   pushd /tmp/wp-fork > /dev/null 2>&1
   change_count=$(git status -s | wc -l)
   popd > /dev/null 2>&1
@@ -282,6 +302,9 @@ function nothing_to_commit() {
 # Commit the changes currently in the local repo             #
 ##############################################################
 function commit_changes() {
+  if [ ! -d /tmp/wp-fork ]; then
+    return 1
+  fi
   pushd /tmp/wp-fork > /dev/null 2>&1
   git add -A . > /dev/null 2>&1
   git commit -m "Update from upstream" > /dev/null 2>&1
@@ -292,6 +315,9 @@ function commit_changes() {
 # Create a git tag                                           #
 ##############################################################
 function create_git_tag() {
+  if [ ! -d /tmp/wp-fork ]; then
+    return 1
+  fi
   pushd /tmp/wp-fork > /dev/null 2>&1
   git tag $1 > /dev/null 2>&1
   popd > /dev/null 2>&1
@@ -303,6 +329,9 @@ function create_git_tag() {
 # The refspec could be either a branch or a tag              #
 ##############################################################
 function push_ref() {
+  if [ ! -d /tmp/wp-fork ]; then
+    return 1
+  fi
   ref=$1
   pushd /tmp/wp-fork > /dev/null 2>&1
   git push origin $ref > /dev/null 2>&1
