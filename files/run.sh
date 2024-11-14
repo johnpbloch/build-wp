@@ -355,7 +355,7 @@ function get_meta_vcs() {
 ##############################################################
 function run(){
   checkenv
-  git config --global user.email "johnpbloch+ghbot@gmail.com" > /dev/null 2>&1
+  git config --global user.email "20147586+johnpbloch-bot@users.noreply.github.com" > /dev/null 2>&1
   git config --global user.name "John P Bot" > /dev/null 2>&1
   git clone "https://$VCS_AUTH_USER:$VCS_AUTH_PW@github.com/johnpbloch/build-wp.git" /tmp/wp-build > /dev/null 2>&1
   cd /tmp/wp-build
