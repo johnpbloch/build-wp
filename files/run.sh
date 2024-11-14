@@ -367,6 +367,8 @@ function run(){
   UPSTREAM_TAGS=$(echo "${UPSTREAM_TAGS}" | sed -E 's=^([0-9]+\.[0-9]+)$=\1.0=')
   # Get rid of 5.0.5. See https://github.com/johnpbloch/wordpress/issues/41
   UPSTREAM_TAGS=$(echo "${UPSTREAM_TAGS}" | grep -Pv '^5\.0\.5$')
+  # Get rid of 6.5.1. See https://make.wordpress.org/core/2024/04/09/what-happened-to-wordpress-6-5-1/
+  UPSTREAM_TAGS=$(echo "${UPSTREAM_TAGS}" | grep -Pv '^6\.5\.1$')
   # Get all tags already in the local repo
   LOCAL_TAGS=$(git ls-remote --tags https://github.com/johnpbloch/wordpress-core.git | awk '{print $2}' | sed 's=refs/tags/==')
   # Compute all tags in upstream, but not in local
