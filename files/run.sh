@@ -327,7 +327,7 @@ function push_ref() {
   fi
   ref=$1
   pushd /tmp/wp-fork > /dev/null 2>&1
-  git push origin $ref > /dev/null 2>&1
+  git push origin $ref > /dev/null 2>&1 || exit_on_error "Failed to push $ref to origin!" 4
   popd > /dev/null 2>&1
 }
 
